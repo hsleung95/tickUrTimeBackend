@@ -6,6 +6,7 @@ mongoose.Promise = global.Promise;
 const db = {};
 db.mongoose = mongoose;
 db.url = dbConfig.url;
-db.tutorials = require("./activityRecordModel.js")(mongoose);
+db.activityRecords = require("./activityRecordModel.js")(mongoose);
+db.tokens = require("./tokenModel.js")(mongoose);
 
 module.exports = db;
