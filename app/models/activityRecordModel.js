@@ -8,7 +8,8 @@ const ActivityRecord = Schema(
 		startTime: Date,
 		endTime: Date,
 		timeSpent: Number,
-		userId: String
+		userId: String,
+		estimatedTime: Date
 	},
 	{ timestamps: true }
 );

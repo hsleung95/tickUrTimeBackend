@@ -3,3 +3,8 @@ build
 .dockerignore
 Dockerfile
 Dockerfile.prod
+.git
+.gitignore
+README.md
+LICENSE
+.vscode
