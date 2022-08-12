@@ -1,8 +1,9 @@
 const db = require("../models");
 const Activity = require('../models/activityModel.js');
+const initials = ["study","work","rest"];
+
 
 initActivities = async (userId) => {
-	var initials = ["study","work","rest"];
 	var res = true;
 	for (i in initials) {
 		var activity = {userId: userId, name: initials[i], commonlyUsed: true};
@@ -57,7 +58,7 @@ deleteActivity = (id) => {
 	  }
     })
     .catch(err => {
-		console.log("[updateActivity]" + err.message);
+		console.log("[deleteActivity]" + err.message);
 		return false;
     });
 }
@@ -91,8 +92,10 @@ replaceActivityToken = async (oldToken, newToken) => {
         }
         if (activities.length) {
 			activities.forEach(activityRecord => {
-				activityRecord.userId = newToken;
-				activityRecord.save();
+				if (!initials.includes(activityRecord.name)) {
+					activityRecord.userId = newToken;
+					activityRecord.save();
+				}
 			});
         }
 		return true;
