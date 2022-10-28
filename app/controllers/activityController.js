@@ -1,9 +1,7 @@
 const activityService = require("../services/activityService");
-const db = require("../models");
-const Activity = require('../models/activityModel.js');
 
 createActivity = async (req, res) => {
-    if (!req.body) {
+    if (!req.body ||Object.keys(req.body).length === 0) {
         res.status(400).send({ message: "Content can not be empty!" });
         return;
     }
@@ -18,7 +16,7 @@ createActivity = async (req, res) => {
 
 updateActivity = async (req, res) => {
     const id = req.params.id;
-	if (!id || !req.body) {
+	if (!id || !req.body ||Object.keys(req.body).length === 0) {
         res.status(400).send({ message: "Content can not be empty!" });
         return;
     }
@@ -44,16 +42,15 @@ deleteActivity = async (req, res) => {
 	}}
 
 getActivities = async (req, res) => {
-	var records = await activityService.getActivities(req.headers.token)
-	.then(records => {
-		res.status(200).json(records);		
-	});
+	var records = await activityService.getActivities(req.headers.token);
+	console.log(records);
+	res.status(200).json(records);
 }
 
 getAllActivities = async (req,res) => {
-	var records = await activityService.getActivities(null)
+	await activityService.getActivities(null)
 	.then(records => {
-		res.status(200).json(records);		
+		res.status(200).json(records);
 	});
 }
 

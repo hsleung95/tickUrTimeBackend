@@ -1,14 +1,19 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const dynamoose = require('dynamoose');
+const { v4: uuidv4 } = require('uuid');
 
-const Activity = Schema(
+const Activity = new dynamoose.Schema(
 	{
-		userId: String,
-		name: String,
-		interval: Number,
-		commonlyUsed: Boolean
+		"id": {
+			"type": String,
+			"hashKey": true,
+			"default": () => uuidv4()
+		},
+		"userId": String,
+		"name": String,
+		"interval": Number,
+		"commonlyUsed": Boolean
 	},
 	{ timestamps: true }
 );
 
-module.exports = mongoose.model('activity', Activity);
+module.exports = dynamoose.model('activity', Activity);

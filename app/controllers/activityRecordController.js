@@ -3,7 +3,7 @@ const db = require("../models");
 const ActivityRecord = require('../models/activityRecordModel.js');
 
 createActivityRecord = async (req, res) => {
-    if (!req.body) {
+    if (!req.body ||Object.keys(req.body).length === 0) {
         res.status(400).send({ message: "Content can not be empty!" });
         return;
     }
@@ -18,7 +18,7 @@ createActivityRecord = async (req, res) => {
 
 updateActivityRecord = async (req, res) => {
     const id = req.params.id;
-	if (!id || !req.body) {
+	if (!id || !req.body ||Object.keys(req.body).length === 0) {
         res.status(400).send({ message: "Content can not be empty!" });
         return;
     }
