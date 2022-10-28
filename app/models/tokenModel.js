@@ -1,12 +1,16 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const { v4: uuidv4 } = require('uuid');
+const dynamoose = require('dynamoose');
+const Schema = dynamoose.Schema;
 
-const Token = Schema(
+const Token = new Schema(
 	{
-		token: String,
-		lastLogin: Date
+		"token": {
+			"type":String,
+			"hashKey": true
+		},
+		"lastLogin": Date
 	},
 	{ timestamps: true }
 );
 
-module.exports = mongoose.model('token', Token);
+module.exports = dynamoose.model('token', Token);

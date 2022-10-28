@@ -13,95 +13,64 @@ initActivities = async (userId) => {
 }
 
 createActivity = async (param) => {
-    const activity = new Activity(param);
-    if (!activity) {
-        console.log("[createActivity] cannot create activity");
-        return false;
-    }
-
-    return await activity.save()
-    .then(data => {
-        return true;
-    })
-    .catch(err => {
+	try {
+		const activity = await Activity.create(param);
+		return true;
+    } catch (err) {
 		var msg = err.message || "Some error occurred while creating the Activity.";
-        console.log("[createActivity]" + msg);
+        console.log("[createActivityRecord]" + msg);
         return false;
-    });
+    };
 }
 
 updateActivity = async (id,param) => {
-    return Activity.findByIdAndUpdate(id, param, { useFindAndModify: false })
-	.clone()
-    .then(data => {
-		if (!data) {
-			console.log("[updateActivity] update record failed with id: " + id);
+	try {
+		var exists = await Activity.get(id);
+		if (!exists) {
+			console.log("[updateActivity] activity not found with id: " + id);
 			return false;
 		}
-        return true;
-    })
-    .catch(err => {
-		console.log("[updateActivity]" + err.message);
-		return false;
-    });
+		await Activity.update({"id": id}, param);
+		return true;
+    } catch (err) {
+		var msg = err.message || "Some error occurred while updating the Activity.";
+        console.log("[updateActivity]" + msg);
+        return false;
+    };
 }
 
-deleteActivity = (id) => {
-    return Activity.findByIdAndRemove(id)
-	.clone()
-    .then(data => {
-      if (!data) {
-		  console.log("[deleteActivity] cannot delete record with id: " + id);
-		  return false;
-      } else {
-		  return true;
-	  }
-    })
-    .catch(err => {
+deleteActivity = async (id) => {
+	try {
+		var result = await Activity.delete(id);
+		return true;
+    }
+    catch(err) {
 		console.log("[deleteActivity]" + err.message);
 		return false;
-    });
+    };
 }
 
-getActivities = async (token) => {
-	var params = (token == null) ? {} : {userId: token};
-	return await Activity.find(params, (err, activities) => {
-        if (err) {
-			console.log("[getActivities]" + err.message);
-			return [];
-        }
-        if (!activities.length) {
-			console.log("[getActivities] no activity found"); 
-            return [];
-        }
-        return activities;
-    })
-	.clone()
-	.catch(err => {
+getActivities = async (token) => {	
+	var params = (token == null) ? {} : {"userId":{"eq": token}};
+	const result = await Activity.scan(params).exec().then((activities) => {
+		return activities;
+	})
+	.catch((err) => {
 		console.log("[getActivities]" + err.message);
 		return [];
 	});
+	return result;
 }
 
-replaceActivityToken = async (oldToken, newToken) => {
-
-	return await Activity.find({"userId": oldToken}, (err, activities) => {
-        if (err) {
-			console.log("[replaceActivityToken] " + err.message);
-			return false;
-        }
-        if (activities.length) {
-			activities.forEach(activityRecord => {
-				if (!initials.includes(activityRecord.name)) {
-					activityRecord.userId = newToken;
-					activityRecord.save();
-				}
+replaceActivityToken = async (oldToken, newToken) => {	
+	return await Activity.scan({"userId": {"eq": oldToken}}).exec().then((activities) => {
+		if (activities.length) {
+			activities.forEach(activity => {
+				Activity.update({"id": activity.id}, {"userId": newToken});
 			});
-        }
+		}
 		return true;
-    })
-	.clone()
-	.catch(err => {
+	}).catch((err) => {
 		console.log("[replaceActivityToken] " + err.message);
 		return false;
 	});
