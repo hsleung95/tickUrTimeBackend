@@ -11,8 +11,8 @@ const ActivityRecord = new Schema(
 		},
 		"activity": String,
 		"description": String,
-		"startTime": String,
-		"endTime": String,
+		"startTime": Number,
+		"endTime": Number,
 		"timeSpent": Number,
 		"userId": String,
 		"estimatedTime": String

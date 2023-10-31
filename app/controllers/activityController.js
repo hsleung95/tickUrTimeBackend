@@ -43,7 +43,6 @@ deleteActivity = async (req, res) => {
 
 getActivities = async (req, res) => {
 	var records = await activityService.getActivities(req.headers.token);
-	console.log(records);
 	res.status(200).json(records);
 }
 
