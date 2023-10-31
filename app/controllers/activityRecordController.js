@@ -44,9 +44,9 @@ deleteActivityRecord = async (req, res) => {
 	}}
 
 getActivityRecords = async (req, res) => {
-	var records = await activityRecordService.getActivityRecords(req.headers.token)
+	await activityRecordService.getActivityRecords(req.headers.token, req.query.startTime, req.query.endTime)
 	.then(records => {
-		res.status(200).json(records);		
+		res.status(200).json(records);
 	});
 }
 

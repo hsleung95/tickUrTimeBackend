@@ -1,8 +1,10 @@
-const db = require("../models");
 const ActivityRecord = require('../models/activityRecordModel.js');
+const dynamoose = require('dynamoose');
 
 createActivityRecord = async (param) => {
 	try {
+		param.startTime = parseTime(param.startTime);
+		param.endTime = parseTime(param.endTime);
 		const activityRecord = await ActivityRecord.create(param);
 		return true;
     } catch (err) {
@@ -19,6 +21,8 @@ updateActivityRecord = async (id,param) => {
 			console.log("[updateActivityRecord] activityRecord not found with id: " + id);
 			return false;
 		}
+		param.startTime = parseTime(param.startTime);
+		param.endTime = parseTime(param.endTime);
 		await ActivityRecord.update({"id": id}, param);
 		return true;
     } catch (err) {
@@ -39,8 +43,16 @@ deleteActivityRecord = async (id) => {
     };
 }
 
-getActivityRecords = async (token) => {
-	var params = (token == null) ? {} : {"userId":{"eq": token}};
+getActivityRecords = async (token, startTime,endTime) => {
+	var params = (token == null) ? {} : {"userId":{"eq": token},"startTime": {"ge": startTime}};
+	var params = {};
+	if (token != null) {params.userId = {"eq": token}; }
+	if (startTime != null) {
+		params.startTime = {"ge": parseTime(param.startTime)};
+	}
+	if (endTime != null) {
+		params.endTime = {"le": parseTime(param.endTime)};
+	}
 	return await ActivityRecord.scan(params).exec().then((activityRecords) => {
 		return activityRecords;
 	})
@@ -62,6 +74,11 @@ replaceActivityRecordToken = async (oldToken, newToken) => {
 		console.log("[replaceActivityRecordToken] " + err.message);
 		return false;
 	});
+}
+
+parseTime = (time) => {
+	time = new Date(time);
+	return time.getTime();
 }
 
 module.exports = {
