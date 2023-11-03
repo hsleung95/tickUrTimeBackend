@@ -48,10 +48,10 @@ getActivityRecords = async (token, startTime,endTime) => {
 	var params = {};
 	if (token != null) {params.userId = {"eq": token}; }
 	if (startTime != null) {
-		params.startTime = {"ge": parseTime(param.startTime)};
+		params.startTime = {"ge": parseTime(startTime)};
 	}
 	if (endTime != null) {
-		params.endTime = {"le": parseTime(param.endTime)};
+		params.endTime = {"le": parseTime(endTime)};
 	}
 	return await ActivityRecord.scan(params).exec().then((activityRecords) => {
 		return activityRecords;
