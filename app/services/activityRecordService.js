@@ -83,14 +83,31 @@ getActivityRecordsByDate = async (token, activity, startTime, endTime) => {
 getActivityRecordsSummary = async (token, startTime, endTime) => {
 	var records = await module.exports.getActivityRecords(token, null, startTime, endTime);
 	const results = {};
+	activityDates = {};
 	records.forEach((record) => {
 		record.activity.forEach((activity) => {
 			if (!results[activity]) {
-				results[activity] = 0;
+				results[activity] = {
+					total: 0,
+					days: 0,
+					average: 0,
+					participatedAverage: 0
+				};
 			}
-			results[activity] += record.timeSpent;
+			if (!activityDates[activity]) {
+				activityDates[activity] = new Set();
+			}
+			results[activity].total += record.timeSpent;
+			activityDates[activity].add(parseTime(record.startTime));
 		});
 	});
+	var period = getPeriod(startTime, endTime);
+	for (var key in results) {
+		var days = activityDates[key].size;
+		results[key].average = Math.round(results[key].total/period);
+		results[key].participatedAverage = Math.round(results[key].total/days);
+		results[key].days = days;
+	}
 	return results;
 }
 
@@ -123,6 +140,11 @@ parseDate = (date) => {
 	var month = padZero(date.getMonth() + 1);
 	var day = padZero(date.getDate());
 	return year + '-' + month + '-' + day;
+}
+
+getPeriod = (startTime, endTime) => {
+	var period = (parseTime(endTime) - parseTime(startTime))/(1000*60*60*24);
+	return (period < 1) ? 1 : period;
 }
 
 module.exports = {
