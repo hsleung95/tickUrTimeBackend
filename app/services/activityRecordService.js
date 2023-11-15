@@ -5,7 +5,7 @@ createActivityRecord = async (param) => {
 	try {
 		param.startTime = parseTime(param.startTime);
 		param.endTime = parseTime(param.endTime);
-		const activityRecord = await ActivityRecord.create(param);
+		await ActivityRecord.create(param);
 		return true;
     } catch (err) {
 		var msg = err.message || "Some error occurred while creating the ActivityRecord.";
@@ -43,23 +43,55 @@ deleteActivityRecord = async (id) => {
     };
 }
 
-getActivityRecords = async (token, startTime,endTime) => {
-	var params = (token == null) ? {} : {"userId":{"eq": token},"startTime": {"ge": startTime}};
+getActivityRecords = async (token, activity, startTime, endTime) => {
 	var params = {};
-	if (token != null) {params.userId = {"eq": token}; }
+	if (token != null) {
+		params.userId = {"eq": token}; 
+	}
 	if (startTime != null) {
 		params.startTime = {"ge": parseTime(startTime)};
 	}
 	if (endTime != null) {
 		params.endTime = {"le": parseTime(endTime)};
 	}
-	return await ActivityRecord.scan(params).exec().then((activityRecords) => {
+	if (activity != null) {
+		params.activity = {"contains": activity};
+	}
+	return await ActivityRecord.query(params).using("getActivityRecords").exec().then((activityRecords) => {
 		return activityRecords;
 	})
 	.catch((err) => {
-		console.log("[getActivityRecords]" + err.message);
+		console.log("[getActivityRecords]" + err);
+		console.log(err);
 		return [];
 	});
+}
+
+getActivityRecordsByDate = async (token, activity, startTime, endTime) => {
+	var records = await module.exports.getActivityRecords(token, activity, startTime, endTime);
+	const result = {};
+	records.forEach(record => {
+		var date = parseDate(new Date(record.startTime));
+		if (!result[date]) {
+			result[date] = [];
+		}
+		result[date].push(record);
+	});
+	return result;
+}
+
+getActivityRecordsSummary = async (token, startTime, endTime) => {
+	var records = await module.exports.getActivityRecords(token, null, startTime, endTime);
+	const results = {};
+	records.forEach((record) => {
+		record.activity.forEach((activity) => {
+			if (!results[activity]) {
+				results[activity] = 0;
+			}
+			results[activity] += record.timeSpent;
+		});
+	});
+	return results;
 }
 
 replaceActivityRecordToken = async (oldToken, newToken) => {
@@ -81,10 +113,24 @@ parseTime = (time) => {
 	return time.getTime();
 }
 
+padZero = (val) => {
+	return (val < 10) ? '0' + val : val;
+}
+
+parseDate = (date) => {
+	if (date == null) return '';
+	var year = date.getFullYear();
+	var month = padZero(date.getMonth() + 1);
+	var day = padZero(date.getDate());
+	return year + '-' + month + '-' + day;
+}
+
 module.exports = {
     createActivityRecord,
     updateActivityRecord,
     deleteActivityRecord,
     getActivityRecords,
-	replaceActivityRecordToken
+	replaceActivityRecordToken,
+	getActivityRecordsByDate,
+	getActivityRecordsSummary
 }

@@ -9,15 +9,25 @@ const ActivityRecord = new Schema(
 			"hashKey": true,
 			"default": () => uuidv4()
 		},
-		"activity": String,
+		"activity": {
+			"type": Array,
+			"schema": [String]
+		},
 		"description": String,
 		"startTime": Number,
 		"endTime": Number,
 		"timeSpent": Number,
-		"userId": String,
+		"userId": {
+			"type": String,
+			"index": {
+				"name": "getActivityRecords"
+			}
+		},
 		"estimatedTime": String
 	},
-	{ timestamps: true }
+	{
+		"timestamps": true
+	}
 );
 
 module.exports = dynamoose.model('activityRecord', ActivityRecord);
