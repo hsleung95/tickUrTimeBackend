@@ -44,16 +44,23 @@ deleteActivityRecord = async (req, res) => {
 	}}
 
 getActivityRecords = async (req, res) => {
-	await activityRecordService.getActivityRecords(req.headers.token, req.query.startTime, req.query.endTime)
+	await activityRecordService.getActivityRecordsByDate(req.headers.token,req.query.activity, req.query.startTime, req.query.endTime)
 	.then(records => {
 		res.status(200).json(records);
 	});
 }
 
 getAllActivityRecords = async (req,res) => {
-	var records = await activityRecordService.getActivityRecords(null)
+	await activityRecordService.getActivityRecords(null,null,null,null)
 	.then(records => {
-		res.status(200).json(records);		
+		res.status(200).json(records);	
+	});
+}
+
+getActivityRecordsSummary = async (req, res) => {
+	await activityRecordService.getActivityRecordsSummary(req.headers.token, req.query.startTime, req.query.endTime)
+	.then(result => {
+		res.status(200).json(result);
 	});
 }
 
@@ -62,5 +69,6 @@ module.exports = {
     updateActivityRecord,
     deleteActivityRecord,
     getActivityRecords,
-	getAllActivityRecords
+	getAllActivityRecords,
+	getActivityRecordsSummary
 }
