@@ -98,7 +98,7 @@ getActivityRecordsSummary = async (token, startTime, endTime) => {
 				activityDates[activity] = new Set();
 			}
 			results[activity].total += record.timeSpent;
-			activityDates[activity].add(parseTime(record.startTime));
+			activityDates[activity].add(parseDate(record.startTime));
 		});
 	});
 	var period = getPeriod(startTime, endTime);
@@ -134,8 +134,9 @@ padZero = (val) => {
 	return (val < 10) ? '0' + val : val;
 }
 
-parseDate = (date) => {
-	if (date == null) return '';
+parseDate = (val) => {
+	if (val == null) return '';
+	var date = new Date(val);
 	var year = date.getFullYear();
 	var month = padZero(date.getMonth() + 1);
 	var day = padZero(date.getDate());
