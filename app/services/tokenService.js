@@ -15,7 +15,7 @@ createToken = async (newToken) => {
 			return token;
 		}
 		token = await Token.create({"lastLogin": new Date(), "token":newToken});
-		activityService.initActivities(newToken);
+		//activityService.initActivities(newToken);
 		return token;
     } catch (err) {
 		var msg = err.message || "Some error occurred while creating the Token.";
@@ -28,7 +28,7 @@ createToken = async (newToken) => {
 replaceToken = async (oldToken, newToken) => {
 	var token = await module.exports.createToken(newToken);
 	await activityRecordService.replaceActivityRecordToken(oldToken, newToken);
-	await activityService.replaceActivityToken(oldToken, newToken);
+	//await activityService.replaceActivityToken(oldToken, newToken);
 	return true;
 
 }
